@@ -20,6 +20,7 @@ public:
 //  virtual void edit(SceneObject* obj);
   virtual bool isClosedU() const;
   virtual bool isClosedV() const;
+  virtual void localSimulate(double dt);
 //  virtual void preSample(int m1, int m2, int d1, int d2, float s_u, float s_v, float e_u, float e_v);
 //  virtual void replot(int m1, int m2, int d1, int d2);
 

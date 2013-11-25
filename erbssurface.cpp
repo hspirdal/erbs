@@ -26,7 +26,7 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
   v_.create(num_v, c->getParDeltaV());
   u_.pad(closed_u_); v_.pad(closed_v_);
 
-  // Split the surface up in smaller patches
+  // Split the surface up in smaller patchesbuild
   int numSubsurfs = 0;
   int uk =  closed_u_?  1 : 0;
   int vk = closed_v_ ? 1 : 0;
@@ -39,7 +39,7 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
         insertPatch(c_[i][j]);
         numSubsurfs++;
 
-        qDebug() << "i,j" << i << "," << j;
+        //qDebug() << "i,j" << i << "," << j;
     }
   }
 
@@ -89,6 +89,7 @@ void ERBSSurface::init()
 void ERBSSurface::insertPatch(GMlib::PSurf<float, 3> *patch)
 {
   patch->enableDefaultVisualizer();
+  patch->setCollapsed(true);
   patch->replot(10, 10, 1, 1);
 
   insert(patch);
@@ -102,14 +103,15 @@ void  ERBSSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
   // Find the index for current knot-interval for u_k and v_k.
   int uk = nextKnotIntervalIndex(u_, u);
   int vk = nextKnotIntervalIndex(v_, v);
-  std::cout <<  "uk: " << uk << ". ";  Util::writeDebugValues(u_.data(), "u_vec:");
-  std::cout <<  "vk: " << vk << ". ";  Util::writeDebugValues(v_.data(), "v_vec:");
+//  std::cout <<  "uk: " << uk << ". ";  Util::writeDebugValues(u_.data(), "u_vec:");
+//  std::cout <<  "vk: " << vk << ". ";  Util::writeDebugValues(v_.data(), "v_vec:");
 
   // Evaluation from right in the matrix, find first knot
   if(!lu) while(std::abs(u_[uk] - u_[uk-1]) < Constants::AlmostZero) --uk;
   if(!lv) while(std::abs(v_[vk] - v_[vk-1]) < Constants::AlmostZero) --vk;
 
   GMlib::DMatrix<GMlib::Vector<float, 3> > s0 = getC(u, v, uk, vk, d1, d2);
+
 
   // return only first patch result if we're on a knot.
   if(std::abs(v - v_[vk]) < Constants::AlmostZero)
@@ -129,6 +131,11 @@ void  ERBSSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
   computePascalTriangleNumbers(B, a, s0, s1);
   s1.transpose();
   _p = s1;
+}
+
+void ERBSSurface::localSimulate(double dt)
+{
+  replot();
 }
 
 void ERBSSurface::computePascalTriangleNumbers(GMlib::DVector<float>& B, GMlib::DVector<float>& a, DMat3F& s0, DMat3F& s1)

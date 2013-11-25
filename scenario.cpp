@@ -21,7 +21,7 @@ void Scenario::setupScenario() {
   TestTorus *torus = new TestTorus();
 //  torus->setMaterial(GMmaterial::PolishedCopper);
 //  torus->toggleDefaultVisualizer();
-//  torus->insertVisualizer(normals_visu);
+////  //torus->insertVisualizer(normals_visu);
 //  torus->replot(50, 50, 2, 2);
 //  insert(torus);
 
@@ -49,7 +49,8 @@ void Scenario::setupScenario() {
     ERBSSurface* erbsurf = new ERBSSurface(torus, 4, 4);
     //ERBSSurface* erbsurf = new ERBSSurface(plane, 4, 4, false, false);
     erbsurf->toggleDefaultVisualizer();
-    erbsurf->replot(10, 10, 1, 1);
+    erbsurf->setMaterial(GMmaterial::PolishedCopper);
+    erbsurf->replot(20, 20, 1, 1);
     insert(erbsurf);
 
 }
