@@ -1,26 +1,33 @@
-//#ifndef KNOTVECTOR_H
-//#define KNOTVECTOR_H
+#ifndef KNOTVECTOR_H
+#define KNOTVECTOR_H
 
-//#include <gmCoreModule>
+#include <gmCoreModule>
 
-//class KnotVector : public GMlib::DVector<float>
-//{
-//public:
-//  KnotVector();
-//  void create(int numElements, float deltaSize, bool isClosed);
+class KnotVector
+{
+public:
+  KnotVector();
+  KnotVector(int size, float deltaSize, bool isClosed);
 
-//private:
-//  KnotVector(const KnotVector& copy); // nocopy
-//  void create(int numElements, float deltaSize);
-//  void pad();
+  float operator[](int i) { return kv_[i]; }
 
-//  GMlib::DVector<float> kv_;
-//  float deltaSize_;
-//  int numElements_;
-//  bool isClosed_;
+  void create(int size, float deltaSize);
+  void pad(bool isClosed);
+
+  const GMlib::DVector<float>& data() const { return kv_; }
+  int getDim() const { return kv_.getDim(); }
+
+private:
+  KnotVector(const KnotVector& copy); // nocopy
+
+
+  GMlib::DVector<float> kv_;
+  float deltaSize_;
+  int size_;
+  bool isClosed_;
 
 
 
-//};
+};
 
-//#endif // KNOTVECTOR_H
+#endif // KNOTVECTOR_H

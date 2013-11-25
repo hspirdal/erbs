@@ -4,13 +4,15 @@
 #include <gmParametricsModule>
 #include "knotvector.h"
 
+typedef GMlib::DMatrix<GMlib::Vector<float, 3> > DMat3F;
+typedef GMlib::Point<float, 2> Point2F;
+
 class ERBSSurface : public GMlib::PSurf<float, 3>
 {
   GM_SCENEOBJECT(ERBSSurface)
 public:
   ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v);
   virtual ~ERBSSurface();
-  ERBSSurface(const ERBSSurface& copy); // nocopy
 
 //  GMlib::DVector<float>& getKnotU();
 //  GMlib::DVector<float>& getKnotV();
@@ -24,8 +26,10 @@ public:
 protected:
   bool closed_u_;
   bool closed_v_;
-  GMlib::DVector<float> v_;
-  GMlib::DVector<float> u_;
+//  GMlib::DVector<float> v_;
+//  GMlib::DVector<float> u_;
+  KnotVector u_;
+  KnotVector v_;
   GMlib::DMatrix<GMlib::PSurf<float, 3>* > c_;
   GMlib::ERBSEvaluator<long double>* evaluator_;
   GMlib::PSurf<float, 3>* surf_;
@@ -40,11 +44,13 @@ protected:
   GMlib::DMatrix< GMlib::Vector<float, 3> > getC(float u, float v, int uk, int vk, float du, float dv);
 
 private:
-  void createKnotVectors(GMlib::DVector<float>& knotVector, int size, float delta_size);
-  void padKnotVector(GMlib::DVector<float>& knotVector, bool isClosed);
+  ERBSSurface(const ERBSSurface& copy); // nocopy
   void insertPatch(GMlib::PSurf<float, 3>* patch);
-
   void getB(GMlib::DVector<float>& B, const GMlib::DVector<float>& kv, int tk, float t, int d);
+
+  /* helpers */
+  int nextKnotIntervalIndex(KnotVector& kv, float val);
+  void computePascalTriangleNumbers(GMlib::DVector<float>& B, GMlib::DVector<float>& a, DMat3F& s0, DMat3F& s1);
 
 
 };

@@ -72,6 +72,10 @@ add_library( ${PROJECT_NAME} SHARED
   erbssurface.h
   erbssurface.cpp
   Constants.h
+  util.h
+  util.cpp
+  knotvector.h
+  knotvector.cpp
 #  ${RCCS}
 )
 

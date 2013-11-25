@@ -3,6 +3,8 @@
 #include "Constants.h"
 #include <QDebug>
 #include <complex>
+#include "util.h"
+
 
 ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
 {
@@ -19,12 +21,10 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
   num_v += closed_v_ ? 1 : 0;
   c_.setDim(num_u, num_v);
 
-  createKnotVectors(u_, num_u, c->getParDeltaU());
-  createKnotVectors(v_, num_v, c->getParDeltaV());
-
-  // Generate the padding on both ends of the knotvectors.
-  padKnotVector(u_, closed_u_);
-  padKnotVector(v_, closed_v_ );
+  // Generate and pad the knotvectors.
+  u_.create(num_u, c->getParDeltaU());
+  v_.create(num_v, c->getParDeltaV());
+  u_.pad(closed_u_); v_.pad(closed_v_);
 
   // Split the surface up in smaller patches
   int numSubsurfs = 0;
@@ -62,7 +62,7 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
     c_[num_u-1][num_v-1] = c_[0][num_v-1];
   }
 
-  qDebug() << "Num Subsurfs:" << numSubsurfs;
+  //qDebug() << "Num Subsurfs:" << numSubsurfs;
 }
 
 ERBSSurface::ERBSSurface(const ERBSSurface &copy)
@@ -86,37 +86,6 @@ void ERBSSurface::init()
 
 }
 
-void ERBSSurface::createKnotVectors(GMlib::DVector<float>& knotVector, int size, float delta_size)
-{
-  knotVector.setDim(size+2);
-
-  for(int i = 1; i <= size; i++)
-  {
-    knotVector[i] = (i - 1) * delta_size / (size-1);
-  }
-//  qDebug() << "knotcreate:";
-//  for(int i = 0; i < knotVector.getDim(); i++)
-//    qDebug() << knotVector[i];
-}
-
-void ERBSSurface::padKnotVector(GMlib::DVector<float> &knotVector, bool isClosed)
-{
-  if(isClosed)
-  {
-    knotVector[0] = knotVector[1] - (knotVector[knotVector.getDim()-2] - knotVector[knotVector.getDim()-3]);
-    knotVector[knotVector.getDim()-1] = knotVector[knotVector.getDim()-2] + knotVector[2] - knotVector[1];
-
-  }
-  else
-  {
-    knotVector[0] = knotVector[1];
-    knotVector[knotVector.getDim()-1] = knotVector[knotVector.getDim()-2];
-  }
-  qDebug() << "knotpad:";
-  for(int i = 0; i < knotVector.getDim(); i++)
-    qDebug() << knotVector[i];
-}
-
 void ERBSSurface::insertPatch(GMlib::PSurf<float, 3> *patch)
 {
   patch->enableDefaultVisualizer();
@@ -127,142 +96,107 @@ void ERBSSurface::insertPatch(GMlib::PSurf<float, 3> *patch)
 
 void  ERBSSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
 {
-  _p.setDim(1,1);
-  _p[0][0] = GMlib::Vector<float,3>(0,0,0);
+//  _p.setDim(1,1);
+//  _p[0][0] = GMlib::Vector<float,3>(0,0,0);
 
-  // Find knot indices u_k and v_k
-  int uk, vk;
-  qDebug() << "u:v" << u << "," << v;
-  for(uk = 1; uk < u_.getDim()-2; ++uk)
-  {
-    if(u < u_[uk+1])
-    {
-      qDebug() << "u break";
-      break;
-    }
-  }
-
-  if(uk == u_.getDim()-2)
-    uk--;
-
-
-  for(vk = 1; vk < v_.getDim()-2; ++vk)
-  {
-    if(v < v_[vk+1])
-    {
-      qDebug() << "v break";
-      break;
-    }
-  }
-
-  if(vk == v_.getDim()-2)
-    vk--;
-
-  qDebug() << "uk:vk" << uk << "," << vk;
+  // Find the index for current knot-interval for u_k and v_k.
+  int uk = nextKnotIntervalIndex(u_, u);
+  int vk = nextKnotIntervalIndex(v_, v);
+  std::cout <<  "uk: " << uk << ". ";  Util::writeDebugValues(u_.data(), "u_vec:");
+  std::cout <<  "vk: " << vk << ". ";  Util::writeDebugValues(v_.data(), "v_vec:");
 
   // Evaluation from right in the matrix, find first knot
   if(!lu) while(std::abs(u_[uk] - u_[uk-1]) < Constants::AlmostZero) --uk;
   if(!lv) while(std::abs(v_[vk] - v_[vk-1]) < Constants::AlmostZero) --vk;
 
-  qDebug() << "uk:vk" << uk << "," << vk;
-
-  // Get result of inner loop for first patch in v
   GMlib::DMatrix<GMlib::Vector<float, 3> > s0 = getC(u, v, uk, vk, d1, d2);
 
-  // If placed on a knot, return only first patch result
-  if(std::abs(v - v_[vk]) < 1e-5)
+  // return only first patch result if we're on a knot.
+  if(std::abs(v - v_[vk]) < Constants::AlmostZero)
   {
-    this->_p = s0;
+    _p = s0;
     return;
   }
-  else
-  {
-    // Get result of inner loop for second patch in v
-    GMlib::DMatrix<GMlib::Vector<float, 3> > s1 = getC(u, v, uk, vk+1, d1, d2);
+  // Blend the patches
+  GMlib::DMatrix<GMlib::Vector<float, 3> > s1 = getC(u, v, uk, vk+1, d1, d2);
+  GMlib::DVector<float> B;
+  getB(B, v_.data(), vk, v, d2);
+  GMlib::DVector<float> a(B.getDim());
+  s0 -= s1;
 
-    // Evaluate ERBS-basis in v direction
-    GMlib::DVector<float> B;
-    getB(B, v_, vk, v, d2);
-
-    // Compute "Pascals triangle" numbers and correct patch matrix
-    GMlib::DVector<float> a(B.getDim());
-    s0 -= s1;
-    s0.transpose(); s1.transpose();
-    for(int i = 0; i < B.getDim(); i++)
-    {
-      a[i] = 1;
-      for(int j = i-1; j > 0; j--)
-        a[j] += a[j-1];   // compute "pascal's triangle" numbers
-
-      for(int j = 0; j <= i; j++)
-        s1[i] += (a[j]*B[j]) * s0[i-j]; // "column += scalar x column"
-    }
-    s1.transpose();
-
-    this->_p = s1;
-  }
-
+  // compute for columns. (column += scalar x column)
+  s0.transpose(); s1.transpose();
+  computePascalTriangleNumbers(B, a, s0, s1);
+  s1.transpose();
+  _p = s1;
 }
 
-GMlib::DMatrix< GMlib::Vector<float, 3> > ERBSSurface::getC(float u, float v, int uk, int vk, float du, float dv)
+void ERBSSurface::computePascalTriangleNumbers(GMlib::DVector<float>& B, GMlib::DVector<float>& a, DMat3F& s0, DMat3F& s1)
 {
-
-  // init indexes and get local u/v values
-  const int cu = uk-1;
-  const int cv = vk-1;
-
-  assert(cu >= 0);
-  assert(cv >= 0);
-
-  qDebug() << "cu, cv:" << cu << "," << cv;
-  //c_[cu][cv]
-
-  const GMlib::Point<float,2>& lm = c_[cu][cv]->getLocalMapping( GMlib::Point<float,2>(u,v),
-                                   GMlib::Point<float,2>( u_[uk-1], v_[vk-1]),
-                                   GMlib::Point<float,2>( u_[uk+1], v_[vk+1]));
-
-  assert(cu < c_.getDim1() && cv < c_.getDim2() && "out of bounds on c_");
-
-  // Evaluate first local patch.
-  GMlib::DMatrix<GMlib::Vector<float,3> > c0 = c_[cu][cv]->evaluateParent(lm(0), lm(1), du, dv);
-
-  // If on a interpolation point, return only first patch evaluation.
-  if(std::abs(u - uk) < Constants::AlmostZero)
-    return c0;
-
-  // Select next local patch in u direction.
-  uk++;
-  qDebug() << "incr uk:" << uk;
-
-  // Init indexes and get local u/v values
-  const int cu2 = uk-1;
-  const int cv2 = vk-1;
-  const GMlib::Point<float, 2>& lm2 = c_[cu2][cv2]->getLocalMapping(GMlib::Point<float, 2>(u, v),
-                                                             GMlib::Point<float, 2>(u_[uk-1], v_[vk-1]),
-                                                             GMlib::Point<float, 2>(u_[uk+1], v_[vk+1]));
-
-  // Evaluate second local patch
-  GMlib::DMatrix<GMlib::Vector<float, 3> > c1 = c_[cu2][cv2]->evaluateParent(lm2(0), lm2(1), du, dv);
-  GMlib::DVector<float> a(du+1);
-
-  // Evaluate ERBS-basis in u direction
-  GMlib::DVector<float> B;
-  getB(B, u_, uk-1, u, du);
-
-  // Compute "Pascals triangle" -numbers and correct patch matrix
-  c0 -= c1;
   for(int i = 0; i < B.getDim(); i++)
   {
     a[i] = 1;
     for(int j = i-1; j > 0; j--)
-      a[j] += a[j-1];
+      a[j] += a[j-1]; // compute Pascal's Triangle numbers.
     for(int j = 0; j <= i; j++)
-      c1[i] += (a[j] * B[j]) * c0[i-j];
+      s1[i] += (a[j]*B[j]) * s0[i-j];
   }
+}
+
+int ERBSSurface::nextKnotIntervalIndex(KnotVector& kv, float val)
+{
+  int k=0;
+  for(k=1; k < kv.getDim()-2; ++k)
+    if(val < kv[k+1])
+      return k;
+
+  // Handling edges.
+  return k-1;
+}
+
+GMlib::DMatrix< GMlib::Vector<float, 3> > ERBSSurface::getC(float u, float v, int uk, int vk, float du, float dv)
+{
+  // init indexes and get local u/v values
+  const int cu = uk-1;
+  const int cv = vk-1;
+  assert(cu >= 0 && cv >= 0);
+
+  const Point2F& lm = c_[cu][cv]->getLocalMapping(Point2F(u, v), Point2F(u_[uk-1], v_[vk-1]), Point2F(u_[uk+1], v_[vk+1]));
+
+  // Result evaluating local patch - (k_u, k_v)
+  DMat3F c0 = c_[cu][cv]->evaluateParent(lm(0), lm(1), du, dv);
+
+  // If on an interpolation point, return only first patch evaluation
+  if(std::abs(u - u_[uk]) < Constants::AlmostZero)
+    return c0;
+
+  // Select next local patch in U direction.
+  uk++;
+
+  // init indexes and get local u/v values
+  const int cu2 = uk-1;
+  const int cv2 = vk-1;
+
+  // Result evaluating 2nd local patch
+  const Point2F& lm2 = c_[cu2][cv2]->getLocalMapping(Point2F(u, v),Point2F(u_[uk-1], v_[vk-1]), Point2F(u_[uk+1], v_[vk+1]));
+
+  DMat3F c1 = c_[cu2][cv2]->evaluateParent(lm2(0), lm2(1), du, dv);
+
+  // For numbers - "Pascals triangle".
+  GMlib::DVector<float> a(du+1);
+
+  // Result evaluating ERBS-basis (alg10).
+  GMlib::DVector<float> B;
+  getB(B, u_.data(), uk-1, u, du);
+
+  // The matrix c0 is now c^0 expanded (5.7).
+  c0 -= c1;
+
+  computePascalTriangleNumbers(B, a, c0, c1);
   return c1;
 }
 
-void ERBSSurface::getB(GMlib::DVector<float> &B, const GMlib::DVector<float> &kv, int tk, float t, int d)
+void ERBSSurface::getB(GMlib::DVector<float> &B, const GMlib::DVector<float>& kv, int tk, float t, int d)
 {
   B.setDim(d+1);
 
