@@ -16,7 +16,7 @@ void Scenario::setupScenario() {
 
   using namespace GMlib;
 
-  //PSurfNormalsVisualizer<float,3> *normals_visu = new PSurfNormalsVisualizer<float,3>;
+  PSurfNormalsVisualizer<float,3> *normals_visu = new PSurfNormalsVisualizer<float,3>;
 
   TestTorus *torus = new TestTorus();
 //  torus->setMaterial(GMmaterial::PolishedCopper);
@@ -48,13 +48,15 @@ void Scenario::setupScenario() {
     ERBSSurface* erbsurf = new ERBSSurface(torus, 4, 4);
     //ERBSSurface* erbsurf = new ERBSSurface(plane, 4, 4);
     erbsurf->toggleDefaultVisualizer();
-    erbsurf->setMaterial(GMmaterial::PolishedCopper);
+    //  erbsurf->insertVisualizer(normals_visu);
+    erbsurf->setMaterial(GMmaterial::Emerald);
     erbsurf->replot(20, 20, 1, 1);
     insert(erbsurf);
 
 
 //    GMlib::PERBSSurf<float>* realerb = new GMlib::PERBSSurf<float>(torus, 20, 20, 1, 1);
 //    realerb->toggleDefaultVisualizer();
+
 //    realerb->setMaterial(GMmaterial::PolishedCopper);
 //    realerb->replot(20, 20, 1, 1);
 //    realerb->showLocalPatches();

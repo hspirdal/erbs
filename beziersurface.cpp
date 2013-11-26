@@ -38,6 +38,11 @@ void BezierSurface::init()
   start_v_ = 1.0f;
 }
 
+void BezierSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
+{
+
+}
+
 bool BezierSurface::isClosedU() const
 {
   return closed_u_;

@@ -34,6 +34,7 @@ protected:
   GMlib::DMatrix<GMlib::PSurf<float, 3>* > c_;
   GMlib::ERBSEvaluator<long double>* evaluator_;
   GMlib::PSurf<float, 3>* surf_;
+  int counter_;
 
   virtual void  eval(float u, float v, int d1, int d2, bool lu, bool lv);
   virtual float getEndPU();

@@ -5,6 +5,7 @@
 #include <complex>
 #include "util.h"
 
+#include <gmParametricsModule>
 
 ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
 {
@@ -37,6 +38,8 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
     {
         c_[i][j] = new SubSurface(c, u_[i], u_[i+1], u_[i+2], v_[j], v_[j+1], v_[j+2]);
         insertPatch(c_[i][j]);
+        if(i == 0 && j == 0)
+          c_[i][j]->setCollapsed(false);
         numSubsurfs++;
 
         //qDebug() << "i,j" << i << "," << j;
@@ -72,6 +75,9 @@ ERBSSurface::ERBSSurface(const ERBSSurface &copy)
 
 ERBSSurface::~ERBSSurface()
 {
+  for( int i = 0; i < c_.getDim1(); i++ )
+    for( int j = 0; j < c_.getDim2(); j++ )
+      SceneObject::remove( c_[i][j] );
 }
 
 void ERBSSurface::init()
@@ -81,16 +87,21 @@ void ERBSSurface::init()
   _no_der_u = 1;
   _no_der_v = 1;
 
+  counter_ = 0;
+
   // evaluator.. etc
   evaluator_ = GMlib::ERBSEvaluator<long double>::getInstance();
 
 }
 
-void ERBSSurface::insertPatch(GMlib::PSurf<float, 3> *patch)
+void ERBSSurface::insertPatch(GMlib::PSurf<float, 3>* patch)
 {
+  //GMlib::PSurfNormalsVisualizer<float,3> *normals_visu = new GMlib::PSurfNormalsVisualizer<float,3>;
   patch->enableDefaultVisualizer();
+ // patch->insertVisualizer(normals_visu);
   patch->setCollapsed(true);
   patch->replot(10, 10, 1, 1);
+  patch->setVisible(true);
 
   insert(patch);
 }
@@ -135,6 +146,17 @@ void  ERBSSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
 
 void ERBSSurface::localSimulate(double dt)
 {
+
+  //c_[0][0]->rotate(dt, GMlib::Vector<float,3>(0, 1, 0));
+
+  float scalemod = counter_ > 0  ? 0.001 : -0.001;
+  if(counter_++ > 100)
+    counter_ = -100;
+  float s2 = 1.0f+scalemod;
+  c_[0][0]->scale( GMlib::Point<float, 3>(s2, 1.0f, 1.0f));
+  qDebug() << counter_;
+  qDebug() << s2;
+
   replot();
 }
 
