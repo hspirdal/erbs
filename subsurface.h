@@ -10,19 +10,21 @@ class SubSurface : public GMlib::PSurf<float, 3>
 public:
   SubSurface(GMlib::PSurf<float, 3>* surf, float u_start, float u, float u_end, float v_start, float v, float v_end);
   virtual ~SubSurface() {}
-  SubSurface(const SubSurface& copy);
+
 
   virtual bool  isClosedU() const;
   virtual bool  isClosedV() const;
 
 protected:
+  SubSurface(const SubSurface& copy);
   virtual void  eval(float u, float v, int d1, int d2, bool lu, bool lv);
   virtual float getEndPU();
   virtual float getEndPV();
   virtual float getStartPU();
   virtual float getStartPV();
 
-private:
+  void set(GMlib::PSurf<float, 3>* surf, float u_start, float u, float u_end, float v_start, float v, float v_end);
+
   GMlib::PSurf<float, 3>* surf_;
   float u_start_;
   float u_;
@@ -34,7 +36,7 @@ private:
   GMlib::Vector<float, 2> q_;
 
 
-  void set(GMlib::PSurf<float, 3>* surf, float u_start, float u, float u_eend, float v_start, float v, float v_end);
+
 
 
 

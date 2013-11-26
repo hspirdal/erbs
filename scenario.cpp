@@ -25,15 +25,14 @@ void Scenario::setupScenario() {
 //  torus->replot(50, 50, 2, 2);
 //  insert(torus);
 
-//    Point<float, 3> p = Point<float, 3>(0, 0, 0);
-//    Vector<float, 3> u = Vector<float, 3>(10, 0, 0);
-//    Vector<float, 3> v = Vector<float, 3>(0, 0, 10);
+    Point<float, 3> p = Point<float, 3>(0, 0, 0);
+    Vector<float, 3> u = Vector<float, 3>(10, 0, 0);
+    Vector<float, 3> v = Vector<float, 3>(0, 0, 10);
 
 
-    //PPlane<float>* plane = new PPlane<float>(p, u, v);
-//    plane->toggleDefaultVisualizer();
-//    plane->insertVisualizer(normals_visu);
-//    plane->replot(2, 2, 2, 2);
+    PPlane<float>* plane = new PPlane<float>(p, u, v);
+    plane->toggleDefaultVisualizer();
+    plane->replot(2, 2, 2, 2);
 //    insert(plane);
 
     PCylinder<float>* cyl = new PCylinder<float>(3, 3, 25);
@@ -47,11 +46,19 @@ void Scenario::setupScenario() {
 //    insert(subsurf);
 
     ERBSSurface* erbsurf = new ERBSSurface(torus, 4, 4);
-    //ERBSSurface* erbsurf = new ERBSSurface(plane, 4, 4, false, false);
+    //ERBSSurface* erbsurf = new ERBSSurface(plane, 4, 4);
     erbsurf->toggleDefaultVisualizer();
     erbsurf->setMaterial(GMmaterial::PolishedCopper);
     erbsurf->replot(20, 20, 1, 1);
     insert(erbsurf);
+
+
+//    GMlib::PERBSSurf<float>* realerb = new GMlib::PERBSSurf<float>(torus, 20, 20, 1, 1);
+//    realerb->toggleDefaultVisualizer();
+//    realerb->setMaterial(GMmaterial::PolishedCopper);
+//    realerb->replot(20, 20, 1, 1);
+//    realerb->showLocalPatches();
+//    insert(realerb);
 
 }
 

@@ -12,7 +12,7 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
 
   init();
 
-  //surf_ = c;
+  surf_ = c;
 
   closed_u_ = c->isClosedU();
   closed_v_ = c->isClosedV();

@@ -76,6 +76,8 @@ add_library( ${PROJECT_NAME} SHARED
   util.cpp
   knotvector.h
   knotvector.cpp
+  beziersurface.h
+  beziersurface.cpp
 #  ${RCCS}
 )
 

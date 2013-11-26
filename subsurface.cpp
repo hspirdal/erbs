@@ -27,6 +27,7 @@ void SubSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
   GMlib::DMatrix<GMlib::Vector<float, 3> > p = surf_->evaluateParent(u, v, d1, d2);
   this->_p[0][0] = p[0][0] - trans_;
   //qDebug() << _p[0][0][0] << _p[0][0][1] << _p[0][0][2];
+
 }
 
 float SubSurface::getEndPU()
