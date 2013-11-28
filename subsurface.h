@@ -34,6 +34,7 @@ protected:
   float v_end_;
   GMlib::Vector<float, 3> trans_;
   GMlib::Vector<float, 2> q_;
+  GMlib::Angle origAngle_;
 
 
 

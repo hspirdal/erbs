@@ -24,9 +24,13 @@ public:
     }
 
     c_[0][0]->rotate(INC, GMlib::Vector<float,3>(0, 1, 0));
-    c_[2][0]->rotate(-INC, GMlib::Vector<float,3>(1, 0, 0));
-    c_[4][0]->rotate(-INC, GMlib::Vector<float,3>(0, 1, 0));
-    c_[6][0]->rotate(INC, GMlib::Vector<float,3>(1, 0, 0));
+    //    c_[2][0]->rotate(INC, GMlib::Vector<float,3>(0, 1, 0));
+    //    c_[4][0]->rotate(INC, GMlib::Vector<float,3>(0, 1, 0));
+    //    c_[6][0]->rotate(INC, GMlib::Vector<float,3>(0, 1, 0));
+
+//    c_[2][0]->rotate(-INC, GMlib::Vector<float,3>(1, 0, 0));
+//    c_[4][0]->rotate(-INC, GMlib::Vector<float,3>(0, 1, 0));
+//    c_[6][0]->rotate(INC, GMlib::Vector<float,3>(1, 0, 0));
 
     qDebug() << rad_;
   }

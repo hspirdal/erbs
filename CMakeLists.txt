@@ -81,6 +81,8 @@ add_library( ${PROJECT_NAME} SHARED
   knotvector.cpp
   beziersurface.h
   beziersurface.cpp
+  equalizervisualizer.h
+  equalizervisualizer.cpp
 
   effects/effect.h
   effects/RotationThingy.h

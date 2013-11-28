@@ -102,6 +102,7 @@ void ERBSSurface::insertPatch(GMlib::PSurf<float, 3>* patch)
 {
   //GMlib::PSurfNormalsVisualizer<float,3> *normals_visu = new GMlib::PSurfNormalsVisualizer<float,3>;
   patch->enableDefaultVisualizer();
+
   //patch->insertVisualizer(normals_visu);
   patch->setCollapsed(true);
   patch->replot(10, 10, 1, 1);

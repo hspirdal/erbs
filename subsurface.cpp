@@ -9,6 +9,10 @@ SubSurface::SubSurface(GMlib::PSurf<float, 3>* surf, float u_start, float u, flo
   GMlib::DMatrix<GMlib::Vector<float, 3> > tr =  surf_->evaluateParent(u,v, 0,0);
   trans_ = tr[0][0];
   this->DisplayObject::translate(trans_);
+
+  origAngle_ =  this->getNormal().getAngle(GMlib::Vector<float, 3>(0, 0, 1));
+
+  //this->DisplayObject::rotate(origAngle_, GMlib::Vector<float, 3>(1,1,1));
 }
 
 bool SubSurface::isClosedU() const
@@ -24,7 +28,9 @@ bool SubSurface::isClosedV() const
 void SubSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
 {
   this->_p.setDim(3, 3);
+  //this->DisplayObject::rotate(-origAngle_, GMlib::Vector<float, 3>(1,1,1));
   //GMlib::DMatrix<GMlib::Vector<float, 3> > p = surf_->evaluateParent(u, v, d1, d2);
+
   _p = surf_->evaluateParent(u, v, d1, d2);
   this->_p[0][0] -=   trans_;
 
@@ -34,7 +40,10 @@ void SubSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
     _p[1][0] = this->_scale.getMatrix()*_p[1][0];
     _p[0][1] = this->_scale.getMatrix()*_p[0][1];
     _p[1][1] = this->_scale.getMatrix()*_p[1][1];
+    //this->DisplayObject::rotate(origAngle_, GMlib::Vector<float, 3>(1,1,1));
+    //_p[0][0] = this->trans_;
   }
+
 
   //qDebug() << _p[0][0][0] << _p[0][0][1] << _p[0][0][2];
 
