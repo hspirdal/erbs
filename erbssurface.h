@@ -3,6 +3,8 @@
 
 #include <gmParametricsModule>
 #include "knotvector.h"
+#include <vector>
+#include "effects/effect.h"
 
 typedef GMlib::DMatrix<GMlib::Vector<float, 3> > DMat3F;
 typedef GMlib::Point<float, 2> Point2F;
@@ -24,6 +26,8 @@ public:
 //  virtual void preSample(int m1, int m2, int d1, int d2, float s_u, float s_v, float e_u, float e_v);
 //  virtual void replot(int m1, int m2, int d1, int d2);
 
+  void addEffect(Effect* effect);
+
 protected:
   bool closed_u_;
   bool closed_v_;
@@ -34,7 +38,6 @@ protected:
   GMlib::DMatrix<GMlib::PSurf<float, 3>* > c_;
   GMlib::ERBSEvaluator<long double>* evaluator_;
   GMlib::PSurf<float, 3>* surf_;
-  int counter_;
 
   virtual void  eval(float u, float v, int d1, int d2, bool lu, bool lv);
   virtual float getEndPU();
@@ -53,6 +56,8 @@ private:
   /* helpers */
   int nextKnotIntervalIndex(KnotVector& kv, float val);
   void computePascalTriangleNumbers(GMlib::DVector<float>& B, GMlib::DVector<float>& a, DMat3F& s0, DMat3F& s1);
+
+  std::vector<Effect*> effects_;
 
 
 };

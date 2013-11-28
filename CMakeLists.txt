@@ -23,7 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_definitions(-DQT_PLUGIN)
 
-
+set(CMAKE_CXX_FLAGS "-fPIC -std=c++11")
 
 ################################
 # Find the required Qt libraries
@@ -63,6 +63,9 @@ set( CMAKE_AUTOMOC on )
 #  resources/gfx.qrc
 #)
 
+# FMod
+#include_directories()
+
 add_library( ${PROJECT_NAME} SHARED
   scenario.h
   scenario.cpp
@@ -78,9 +81,15 @@ add_library( ${PROJECT_NAME} SHARED
   knotvector.cpp
   beziersurface.h
   beziersurface.cpp
+
+  effects/effect.h
+  effects/RotationThingy.h
+  effects/PlaneEqualizerEffect.h
 #  ${RCCS}
 )
 
+#find_package(FMODEX)
+#include_directories(${FMOD_INCLUDE_DIR})
 
 ######
 # link
@@ -88,4 +97,4 @@ add_library( ${PROJECT_NAME} SHARED
 #qt5_use_modules(${PROJECT_NAME} Gui)
 #qt5_use_modules(${PROJECT_NAME} Widgets)
 
-target_link_libraries( ${CMAKE_PROJECT_NAME} plugincore ${GMLIB_LIBRARIES} Qt5::Core )
+target_link_libraries( ${CMAKE_PROJECT_NAME} plugincore ${GMLIB_LIBRARIES} Qt5::Core ${FMOD_LIBRARIES} )
