@@ -103,7 +103,7 @@ private:
   float* specLeft_;
   float* specRight_;
   float* spec_;
-  const int SampleSize = 64;
+  const int SampleSize = 128;
   int displayCounterLag = 0;
   float specAvg_[8];
 
