@@ -4,26 +4,26 @@
 KnotVector::KnotVector()
   : size_(0), deltaSize_(0), isClosed_(false) {}
 
-KnotVector::KnotVector(int size, float deltaSize, bool isClosed)
-  : size_(size), deltaSize_(deltaSize), isClosed_(isClosed)
+KnotVector::KnotVector(int size, float deltaSize, float start, bool isClosed)
+  : size_(size), deltaSize_(deltaSize), start_(start), isClosed_(isClosed)
 {
-  create(size_, deltaSize_);
+  create(size_, deltaSize_, start);
   pad(isClosed_);
 }
 
 
 
-void KnotVector::create(int size, float deltaSize)
+void KnotVector::create(int size, float deltaSize, float start)
 {
   kv_.setDim(size+2);
 
   for(int i = 1; i <= size; i++)
   {
-    kv_[i] = (i - 1) * deltaSize / (size-1);
+    kv_[i] = start + (i - 1) * deltaSize / (size-1);
   }
-//  qDebug() << "knotcreate:";
-//  for(int i = 0; i < knotVector.getDim(); i++)
-//    qDebug() << knotVector[i];
+  qDebug() << "knotcreate:";
+  for(int i = 0; i < kv_.getDim(); i++)
+    qDebug() << kv_[i];
 }
 
 void KnotVector::pad(bool isClosed)
@@ -39,7 +39,7 @@ void KnotVector::pad(bool isClosed)
     kv_[0] = kv_[1];
     kv_[kv_.getDim()-1] = kv_[kv_.getDim()-2];
   }
-//  qDebug() << "knotpad:";
-//  for(int i = 0; i < knotVector.getDim(); i++)
-//    qDebug() << knotVector[i];
+  qDebug() << "knotpad:";
+  for(int i = 0; i < kv_.getDim(); i++)
+    qDebug() << kv_[i];
 }

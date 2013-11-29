@@ -24,8 +24,9 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
   c_.setDim(num_u, num_v);
 
   // Generate and pad the knotvectors.
-  u_.create(num_u, c->getParDeltaU());
-  v_.create(num_v, c->getParDeltaV());
+  u_.create(num_u, c->getParDeltaU(), c->getParStartU());
+  v_.create(num_v, c->getParDeltaV(), c->getParStartV());
+
   u_.pad(closed_u_); v_.pad(closed_v_);
 
   // Split the surface up in smaller patchesbuild
@@ -101,15 +102,40 @@ void ERBSSurface::init()
 void ERBSSurface::insertPatch(GMlib::PSurf<float, 3>* patch)
 {
   //GMlib::PSurfNormalsVisualizer<float,3> *normals_visu = new GMlib::PSurfNormalsVisualizer<float,3>;
-  patch->enableDefaultVisualizer();
-
   //patch->insertVisualizer(normals_visu);
-  patch->setCollapsed(true);
+  //patch->enableDefaultVisualizer();
+  setLocalPatchCollapsed(*patch, false);
   patch->replot(10, 10, 1, 1);
-  patch->setVisible(false);
-
   insert(patch);
 }
+
+void ERBSSurface::setLocalPatchesVisible(bool visible)
+{
+  for(int i = 0; i < c_.getDim1(); i++)
+  {
+    for(int j = 0; j < c_.getDim2(); j++)
+    {
+      c_[i][j]->setVisible(visible);
+      c_[i][j]->replot(10, 10, 1, 1);
+    }
+  }
+}
+
+void ERBSSurface::setLocalPatchesCollapsed(bool collapsed)
+{
+  for(int i = 0; i < c_.getDim1(); i++)
+    for(int j = 0; j < c_.getDim2(); j++)
+      setLocalPatchCollapsed(*c_[i][j], collapsed);
+}
+
+void ERBSSurface::setLocalPatchCollapsed(GMlib::PSurf<float, 3>& patch, bool collapsed)
+{
+  // Seems like the handlebars cuts out if the camera gets soemewhat close on certain surfs
+  // This isn't an issue if they're visible. So turn that on in that case. Locals shouldn't
+  // be displayed when collapsed is true.
+  patch.setVisible(collapsed); patch.setCollapsed(collapsed);
+}
+
 
 void  ERBSSurface::eval(float u, float v, int d1, int d2, bool lu, bool lv)
 {

@@ -23,7 +23,7 @@ void Scenario::setupScenario() {
   EqualizerVisualizer* eq_visu = new EqualizerVisualizer();
 
     TestTorus *torus = new TestTorus();
-////  //torus->insertVisualizer(normals_visu);
+    torus->insertVisualizer(normals_visu);
 
     const float Size = 10;
 
@@ -41,25 +41,15 @@ void Scenario::setupScenario() {
     PlaneEqualizerEffect* effEqual = new PlaneEqualizerEffect();
 
 
-    ERBSSurface* erbsurf = new ERBSSurface(plane, 8, 8);
+    ERBSSurface* erbsurf = new ERBSSurface(plane , 8, 8);
     //erbsurf->toggleDefaultVisualizer();
     erbsurf->insertVisualizer(eq_visu);
     //erbsurf->insertVisualizer(normals_visu);
     erbsurf->setMaterial(GMmaterial::Ruby);
     erbsurf->replot(20, 20, 1, 1);
     insert(erbsurf);
-
+    //erbsurf->setLocalPatchesCollapsed(false);
     erbsurf->addEffect(effEqual);
-
-
-//    GMlib::PERBSSurf<float>* realerb = new GMlib::PERBSSurf<float>(sphere, 20, 20, 1, 1);
-//    realerb->toggleDefaultVisualizer();
-
-//    realerb->setMaterial(GMmaterial::PolishedCopper);
-//    realerb->replot(20, 20, 1, 1);
-//    realerb->showLocalPatches();
-//    insert(realerb);
-
 }
 
 void Scenario::cleanupScenario()

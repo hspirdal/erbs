@@ -7,11 +7,11 @@ class KnotVector
 {
 public:
   KnotVector();
-  KnotVector(int size, float deltaSize, bool isClosed);
+  KnotVector(int size, float deltaSize, float start, bool isClosed);
 
   float operator[](int i) { return kv_[i]; }
 
-  void create(int size, float deltaSize);
+  void create(int size, float deltaSize, float start);
   void pad(bool isClosed);
 
   const GMlib::DVector<float>& data() const { return kv_; }
@@ -25,6 +25,7 @@ private:
   float deltaSize_;
   int size_;
   bool isClosed_;
+  float start_;
 
 
 

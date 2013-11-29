@@ -27,6 +27,9 @@ public:
 //  virtual void replot(int m1, int m2, int d1, int d2);
 
   void addEffect(Effect* effect);
+  void setLocalPatchesVisible(bool visible);
+  void setLocalPatchesCollapsed(bool collapsed);
+  void setLocalPatchCollapsed(GMlib::PSurf<float, 3>& patch, bool collapsed);
 
 protected:
   bool closed_u_;
