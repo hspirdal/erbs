@@ -93,10 +93,7 @@
       const Material &m = obj->getMaterial();
       _prog.setUniform( "u_mat_amb", m.getAmb() );
       //_prog.setUniform( "u_mat_dif", m.getDif() );
-      GMlib::Vector<float, 3> pppp = obj-> getPos();
-      float asd = (obj->getPos()[1]*100.0f);
-      qDebug() << asd;
-      _prog.setUniform( "u_mat_dif", GMlib::Color(0.0f, asd, 0.0f, 255.0f) );
+      _prog.setUniform( "u_mat_dif", GMlib::Color(0.0f, 0.0f, 0.0f, 255.0f) );
       _prog.setUniform( "u_mat_spc", m.getSpc() );
       _prog.setUniform( "u_mat_shi", m.getShininess() );
 
@@ -232,11 +229,10 @@
       "  vec4 light_color = vec4(0.0);\n"
       "float alpha = 0.8f;\n"
           "vec4 c;\n"
-          "if(colorpos.y/5 < 0.3)\n"
-              "c = vec4(0.0f, 0.0f, colorpos.y/5.0f, 1.0f);\n"
-          "if(colorpos.y/5 >= 0.3)\n"
-          "  c = vec4(0.0f, colorpos.y/5.0f, 0.0f, 1.0f);\n"
-          "  gl_FragColor = (1-alpha)*computeLighting( mat, normal, ex_pos ) + alpha*c;\n"
+          "vec4 red = vec4(1.0, 0.0, 0.0, 1.0);\n"
+          "vec4 green = vec4(0.0, 1.0, 0.0, 1.0);\n"
+            "c = mix(red, green, 1-colorpos.y/10);\n"
+          "gl_FragColor = (1-alpha)*computeLighting( mat, normal, ex_pos ) + alpha*c;\n"
       "\n"
       "}\n"
     );

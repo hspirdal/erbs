@@ -1,8 +1,5 @@
 #include "scenario.h"
 
-
-
-
 Scenario::Scenario() {}
 
 Scenario::~Scenario() {}
@@ -20,8 +17,8 @@ void Scenario::setupScenario() {
   const float Size = 10;
 
   Point<float, 3> p = Point<float, 3>(0, 0, 0);
-  Vector<float, 3> u = Vector<float, 3>(0, 0, Size);
-  Vector<float, 3> v = Vector<float, 3>(Size, 0, 0);
+  Vector<float, 3> u = Vector<float, 3>(0, 0, 4);
+  Vector<float, 3> v = Vector<float, 3>(Size*3, 0, 0);
 
 
   plane_ = std::make_shared<PPlane<float>>(p, u, v);
@@ -32,8 +29,7 @@ void Scenario::setupScenario() {
   eff_rotationThingy_ = std::make_shared<RotationThingy>();
   eff_equalizerEffect_ = std::make_shared<PlaneEqualizerEffect>();
 
-
-  erbssurf_ = std::make_shared<ERBSSurface>(plane_.get() , 64, 64);
+  erbssurf_ = std::make_shared<ERBSSurface>(plane_.get() , 8, 8);
   //erbssurf_->toggleDefaultVisualizer();
   erbssurf_->insertVisualizer(eq_visulizer_.get());
   //erbssurf_->insertVisualizer(normals_visu);
@@ -47,5 +43,4 @@ void Scenario::setupScenario() {
 
 void Scenario::cleanupScenario()
 {
-
 }

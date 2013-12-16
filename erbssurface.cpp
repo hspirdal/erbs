@@ -29,7 +29,7 @@ ERBSSurface::ERBSSurface(GMlib::PSurf<float, 3>* c, int num_u, int num_v)
 
   u_.pad(closed_u_); v_.pad(closed_v_);
 
-  // Split the surface up in smaller patchesbuild
+  // Split the surface up in smaller patches
   int numSubsurfs = 0;
   int uk =  closed_u_?  1 : 0;
   int vk = closed_v_ ? 1 : 0;

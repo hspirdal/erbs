@@ -21,9 +21,9 @@ void KnotVector::create(int size, float deltaSize, float start)
   {
     kv_[i] = start + (i - 1) * deltaSize / (size-1);
   }
-  qDebug() << "knotcreate:";
-  for(int i = 0; i < kv_.getDim(); i++)
-    qDebug() << kv_[i];
+//  qDebug() << "knotcreate:";
+//  for(int i = 0; i < kv_.getDim(); i++)
+//    qDebug() << kv_[i];
 }
 
 void KnotVector::pad(bool isClosed)
@@ -39,7 +39,7 @@ void KnotVector::pad(bool isClosed)
     kv_[0] = kv_[1];
     kv_[kv_.getDim()-1] = kv_[kv_.getDim()-2];
   }
-  qDebug() << "knotpad:";
-  for(int i = 0; i < kv_.getDim(); i++)
-    qDebug() << kv_[i];
+//  qDebug() << "knotpad:";
+//  for(int i = 0; i < kv_.getDim(); i++)
+//    qDebug() << kv_[i];
 }
